@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import fs from "fs-extra";
 
 // Verify token for user session
 export const verifyToken = async (req, res, next) => {
@@ -15,11 +16,13 @@ export const verifyToken = async (req, res, next) => {
 
       const decoded = jwt.verify(token, "secret");
 
-      const userInSession = await User.findOne({ _id: decoded.id });
+      // Extract current user in session
+      const userSessionJSON = await fs.readJson("./src/session.json");
 
-      if (!userInSession)
+      // If decoded id is different to userId written into session.json, the provided token is invalid
+      if (userSessionJSON.userId !== decoded.id) {
         return res.status(401).json({ message: "Unauthorized: Invalid token" });
-      else {
+      } else {
         next();
       }
     }

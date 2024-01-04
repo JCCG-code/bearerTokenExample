@@ -2,8 +2,13 @@ import jwt from "jsonwebtoken";
 import fs from "fs-extra";
 import { Router } from "express";
 
+import { verifyToken } from "./verifyToken.js";
+
 const router = Router();
 
+/**
+ * Write an user received by request body into a json file for saving user token
+ */
 router.post("/signIn", async (req, res) => {
   try {
     const { userId, username } = req.body;
@@ -25,9 +30,11 @@ router.post("/signIn", async (req, res) => {
   }
 });
 
-// router.get("/", verifyToken, (req, res) => {
-//   try {
-//   } catch (error) {}
-// });
+/**
+ * Standard route which uses a verifyToken middleware for testing Bearer token functionality
+ */
+router.get("/", verifyToken, (req, res) => {
+  return res.json({ message: "Congrats! You can access to this path :)" });
+});
 
 export default router;
